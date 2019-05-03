@@ -48,6 +48,8 @@ namespace MeteoChrome
             //Apre tab di chrome e driver per la gestione del DOM
             using (IWebDriver driver = new ChromeDriver())
             {
+                //Attesa prima della ricerca di un elemento
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
 
                 //Naviga al sito meteo.it
                 driver.Navigate().GoToUrl("http://www.ilmeteo.it/");
@@ -59,23 +61,17 @@ namespace MeteoChrome
                 search.SendKeys(textToSearch);
                 search.Click();
 
-                //Attesa per il caricamento della pagina
-                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-
                 //Selezione della prima opzione risultante
-                IWebElement line = wait.Until((d) => d.FindElement(By.XPath("//div[@id='ajax_listOfOptions']//child::div[1]//b")));
+                IWebElement line = driver.FindElement(By.XPath("//div[@id='ajax_listOfOptions']//child::div[1]//b"));
 
                 //Salvataggio del luogo di cui osserviamo il meteo
                 luogo = line.Text;
 
                 //Click sul link per caricare il meteo del luogo
                 line.Click();
-
-                //Attesa per il caricamento della pagina
-                WebDriverWait waitForMeteo = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
+               
                 //Selezione del prossimo giorno
-                IWebElement nextDay = waitForMeteo.Until((d) => d.FindElement(By.XPath("//div[@class='locbody-content']//li[3]")));
+                IWebElement nextDay = driver.FindElement(By.XPath("//li[@class='active']//following::li[1]"));
 
                 //Click sul link per spostarsi al giorno successivo
                 nextDay.Click();
